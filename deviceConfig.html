@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <template>
+            <div class="wrapper">
+                <el-tag style="margin-bottom:10px;">所有时间单位均为秒</el-tag>        
+                <el-popover
+                ref="popover"
+                placement="top"
+                width="160"
+                v-model="popoverVisible">
+                <p>
+                    <el-input size="small" v-model="deviceId" placeholder="deviceId" style="margin-bottom:10px;"></el-input>
+                    <el-input size="small" v-model="deviceName" placeholder="deviceName"></el-input>
+                </p>
+                <div style="text-align: right; margin: 0">
+                  <el-button size="mini" type="text" @click="popoverVisible = false">取消</el-button>
+                  <el-button type="primary" size="mini" @click="addSetting">确定</el-button>
+                </div>
+              </el-popover>
+                <el-button style="margin-left:20px;" v-popover:popover size="small">新增</el-button>        
+        <el-table border :data="tableData" style="width: 100%" v-loading="listLoading" @row-click = "handleRowClick">
+            <el-table-column prop="deviceId" label="deviceId" width="180" fixed>
+            </el-table-column>
+
+
+             <el-table-column prop="deviceName" label="deviceName" width="155">
+                <template scope="scope"><el-input v-model="scope.row.deviceName"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="ip" label="ip" width="155">
+            <template scope="scope"><el-input v-model="scope.row.ip"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="port" label="端口号" width="100">
+            <template scope="scope"><el-input v-model="scope.row.port"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="heartbeatInterval" label="心跳间隔时间" width="125">
+            <template scope="scope"><el-input v-model="scope.row.heartbeatInterval"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="gpsRecordInterval" label="GPS记录时间间隔" width="145">
+            <template scope="scope"><el-input v-model="scope.row.gpsRecordInterval"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="gpsUploadInterval" label="GPS上传时间间隔" width="145">
+            <template scope="scope"><el-input v-model="scope.row.gpsUploadInterval"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="canType" label="CAN类型" width="100">
+            <template scope="scope"><el-input v-model="scope.row.canType"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="forwardMaxSpeed" label="向前最大速度" width="125">
+            <template scope="scope"><el-input v-model="scope.row.forwardMaxSpeed"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="backwardMaxSpeed" label="向后最大速度" width="125">
+            <template scope="scope"><el-input v-model="scope.row.backwardMaxSpeed"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="canInfoRecordInterval" label="Can消息记录间隔时间" width="160">
+            <template scope="scope"><el-input v-model="scope.row.canInfoRecordInterval"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="authType" label="授权类型" width="100">
+            <template scope="scope"><el-input v-model="scope.row.authType"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="hbTimeout" label="心跳超时时间" width="125">
+            <template scope="scope"><el-input v-model="scope.row.hbTimeout"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="seatTimeout" label="座椅超时时间" width="125">
+            <template scope="scope"><el-input v-model="scope.row.seatTimeout"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="downloadConfigInterval" label="下载配置项间隔时间" width="150">
+            <template scope="scope"><el-input v-model="scope.row.downloadConfigInterval"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="powerOffDelay" label="关机延迟时间" width="125">
+            <template scope="scope"><el-input v-model="scope.row.powerOffDelay"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="speedSlowdownDelay" label="降速延迟" width="125">
+            <template scope="scope"><el-input v-model="scope.row.speedSlowdownDelay"></el-input></template>
+        </el-table-column>
+        <el-table-column prop="logType" label="日志输出" width="125">
+            <template scope="scope"><el-input v-model="scope.row.logType"></el-input></template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" width="200" align="center">
+            <template slot-scope="scope">
+            <el-button @click="submitRowData(scope.row)" type="text" size="small">保存编辑</el-button>
+            <el-button @click="lock(scope.row.deviceId)" type="text" size="small">lock</el-button>
+            <el-button @click="unlock(scope.row.deviceId)" type="text" size="small">unlock</el-button>
+            <el-button @click="closeTcp(scope.row.deviceId)" type="text" size="small">断开 TCP</el-button>
+            <el-button @click="deleteSetting(scope.row._id)" type="text" size="small">删除</el-button>
+            <el-button @click="resetDevice(scope.row.deviceId)" type="text" size="small">reset</el-button>
+            <el-button @click="rebootDevice(scope.row.deviceId)" type="text" size="small">reboot</el-button>
+        </template>
+        </el-table-column>
+        </el-table>
+    </div>
+    </template>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+
+    <script>
+
+        const STORAGE_KEY = 'device_config';
+        const  bastUrl = "https://ld.test.aisportage.com";
+          new Vue({
+            el: '#app',
+            data() {
+                return {
+                    tableData: [],
+                    deviceId: '',
+                    deviceName: '',
+                    popoverVisible: false,
+                    listLoading: false
+                }
+            },
+            methods: {
+                loadList() {
+                    let that = this;
+                    this.listLoading = true;
+                    $.get(bastUrl+'/api/device/config/list', function(rsp) {
+                        that.tableData = rsp.list;
+                        that.listLoading = false;
+                    });
+                },
+                handleRowClick(row, event, column){
+                    console.log(event.target.nodeName);
+                    if(event.target.nodeName!="INPUT"&&event.target.nodeName!="SPAN"){
+                        console.log("跳转到另一个页面")
+                        localStorage.setItem(STORAGE_KEY,JSON.stringify(row));
+                        location.href="deviceDetail.html";
+                }
+
+                },
+                lock(deviceId) {
+                    let that = this;
+                    $.post(bastUrl+'/api/device/lock', {
+                        deviceId: deviceId
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: 'lock成功',
+                                type: 'success'
+                            });
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: 'lock失败' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                unlock(deviceId) {
+                    let that = this;
+                    $.post(bastUrl+'/api/device/unlock', {
+                        deviceId: deviceId
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: 'unlock成功',
+                                type: 'success'
+                            });
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: 'unlock失败' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                closeTcp(deviceId) {
+                    let that = this;
+                    $.post(bastUrl+'/api/device/closeTcp', {
+                        deviceId: deviceId
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: '断开成功',
+                                type: 'success'
+                            });
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: '断开失败' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+
+                },
+                submitRowData(row) {
+                    let that = this;
+                    $.post(bastUrl+'/api/device/config/update', row, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: '编辑保存成功',
+                                type: 'success'
+                            });
+                        } else {
+                            this.$message({
+                                showClose: true,
+                                message: '编辑保存失败' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                addSetting() {
+                    let that = this;
+                    this.popoverVisible = false;
+                    $.post(bastUrl+'/api/device/config/store', {
+                        deviceId: this.deviceId,
+                        deviceName: this.deviceName
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: '新增成功',
+                                type: 'success'
+                            });
+                            that.deviceId = '';
+                            that.deviceName = '';
+                            that.loadList();
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: '新增失败' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                resetDevice(deviceId){
+                    let that = this;
+                    $.post(bastUrl+'/api/device/reset', {
+                        deviceId: deviceId
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: 'reset发送成功 ',
+                                type: 'success'
+                            });
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: 'reset发送失败 ' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                rebootDevice(deviceId){
+                    let that = this;
+                    $.post(bastUrl+'/api/device/reboot', {
+                        deviceId: deviceId
+                    }, function(response) {
+                        if (response.ret == 1) {
+                            that.$message({
+                                message: 'reboot发送成功 ',
+                                type: 'success'
+                            });
+                        } else {
+                            that.$message({
+                                showClose: true,
+                                message: 'reboot发送失败 ' + response.msg,
+                                type: 'error'
+                            });
+                        }
+                    });
+                },
+                deleteSetting(id) {
+                    let that = this;
+                    this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        $.post(bastUrl+'/api/device/config/delete', {
+                            id: id
+                        }, function(response) {
+                            if (response.ret == 1) {
+                                that.$message({
+                                    message: '删除成功',
+                                    type: 'success'
+                                });
+                                that.loadList();
+                            } else {
+                                that.$message({
+                                    showClose: true,
+                                    message: '删除失败' + response.msg,
+                                    type: 'error'
+                                });
+                            }
+                        });
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
+                }
+            },
+            mounted() {
+                this.loadList();
+            }
+        })
+    </script>
+    <style>
+        .wrapper {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+    </style>
+</body>
+
+</html>
