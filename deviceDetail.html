@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <!-- 引入样式 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
 
 <body>
-<div id="app1">
+<div id="app1" >
     <template>
-
             <el-container>
-                <el-main  width="auto">
-            <el-form :v-model="deviceConfig" ref="deviceConfig" label-width="100px"  style="width:600px;margin-top:30px;margin-left: 36px;">
+                <el-main>
+
+            <el-form :v-model="deviceConfig" ref="deviceConfig" label-width="130px" >
 
                 <el-form-item label="deviceId" prop="deviceId">
                     <div>{{deviceConfig.deviceId}}</div>
@@ -92,22 +93,27 @@
 
                 </el-main>
 
-                <el-aside width="40%" style="margin-top:100px;margin-right: 36px;align-self: left;align-content: center">
 
-                <el-button @click="submitRowData()" type="text" size="small">保存编辑</el-button>
-                <el-button @click="lock()" type="text" size="small">lock</el-button>
-                <el-button @click="unlock()" type="text" size="small">unlock</el-button>
-                <el-button @click="closeTcp()" type="text" size="small">断开 TCP</el-button>
-                <el-button @click="deleteSetting()" type="text" size="small">删除</el-button>
-                <el-button @click="resetDevice()" type="text" size="small">reset</el-button>
-                <el-button @click="rebootDevice()" type="text" size="small">reboot</el-button>
+                <el-header height = "auto">
 
-                </el-aside>
+                    <div>
+                        <el-button @click="submitRowData()" type="text" size="medium">保存编辑</el-button>
+                        <el-button @click="lock()" type="text" size="medium">lock</el-button>
+                        <el-button @click="unlock()" type="text" size="medium">unlock</el-button>
+                        <el-button @click="closeTcp()" type="text" size="medium">断开 TCP</el-button>
+                        <el-button @click="deleteSetting()" type="text" size="medium">删除</el-button>
+                        <el-button @click="resetDevice()" type="text" size="medium">reset</el-button>
+                        <el-button @click="rebootDevice()" type="text" size="medium">reboot</el-button>
+                    </div>
+                </el-header>
+
 
             </el-container>
 
+
     </template>
 </div>
+
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
@@ -307,7 +313,30 @@
             this.loadList();
         }
     })
+
+
 </script>
+
+<style>
+    .el-container {
+        width:100%;
+    }
+
+
+    .el-header{
+        width:100%;
+        position:fixed;
+        background: #DCDFE6;
+        text-align:center;
+        left: 0px;
+        top: 0px;
+    }
+
+    .el-main{
+        margin-top: 60px;
+    }
+
+</style>
 
 
 </body>
